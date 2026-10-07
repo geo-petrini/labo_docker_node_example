@@ -1,0 +1,28 @@
+services:
+  app:
+    build: .
+    container_name: node-mongo-app
+    ports:
+      - "3010:3000"
+    environment:
+      MONGO_URL: mongodb://mongo:27017
+      MONGO_DB: esempio
+    depends_on:
+      mongo:
+        condition: service_healthy
+
+  mongo:
+    image: mongo:7
+    container_name: node-mongo-db
+    ports:
+      - "27018:27017"
+    volumes:
+      - mongo-data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping')"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  mongo-data:
